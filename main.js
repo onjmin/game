@@ -11,19 +11,6 @@
         'strToImg'
     ].map(v=>import(`https://rpgen3.github.io/mylib/export/${v}.mjs`))).then(v=>Object.assign({},...v));
     const undef = void 0;
-    const timer = (func, ms) => {
-        let id, old = 0;
-        const loop = () => {
-            const now = performance.now();
-            if (ms <= now - old) {
-                old = now;
-                func();
-            }
-            id = requestAnimationFrame(loop);
-        };
-        requestAnimationFrame(loop);
-        return () => cancelAnimationFrame(id);
-    };
     const h = $("<body>").appendTo("html").css({
         "text-align": "center",
         padding: "1em"
@@ -61,7 +48,8 @@
     class Anime extends Mover {
         constructor(...arg){
             super(...arg);
-            this.w = this.h = 16 * g_rate;
+            const rate = 3;
+            this.w = this.h = 16 * rate;
             this.anime = 500;
             this.direct = 'd';
         }
@@ -105,7 +93,7 @@
                 this.y = this.horizon;
                 this.anime = 500;
             }
-            if(!this.hide || g_nowTime % 100 < 50) super.update();
+            if(!this._damage || g_nowTime % 200 < 100) super.update();
         }
         jump(){
             if(this._jump || this.y < this.horizon) return;
@@ -113,10 +101,11 @@
             this.anime = 100;
         }
         damage(){
+            if(this._damage) return;
             this.HP--;
-            this.hide = true;
-            timer(() => {
-                this.hide = false;
+            this._damage = true;
+            setTimeout(() => {
+                this._damage = false;
             },2000);
         }
     }
@@ -142,7 +131,6 @@
     g_ctx.imageSmoothingEnabled = false;
     let g_nowTime;
     const g_horizonY = g_ctx.canvas.height - 100;
-    const g_rate = 3;
     class map {
         constructor(){
             const m = new Map,
@@ -177,5 +165,6 @@
     $(window).on('keydown keyup', ({key, type}) => g_keys.set(key, type === 'keydown'));
     const tsukinose = new Player('https://i.imgur.com/orQHJ51.png').goto(300 / 2, 0);
     const kuso = new Enemy('https://i.imgur.com/i3AI9Pw.png');
-    kuso.goto(50, g_horizonY - kuso.h)
+    kuso.goto(50, g_horizonY - kuso.h);
+    window.a = tsukinose;
 })();
