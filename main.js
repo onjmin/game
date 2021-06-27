@@ -51,12 +51,13 @@
         goto(x,y){
             this.x = x;
             this.y = y;
+            return this;
         }
     }
     class Anime extends Mover {
         constructor(...arg){
-            this.x = this.y = 16;
             super(...arg);
+            this.x = this.y = 16;
             this.anime = 500;
             this._anime = 0;
         }
@@ -109,11 +110,11 @@
         }
     }
     const g_ctx = $('<canvas>').appendTo(h).prop({
-        width: 500,
-        height: 500,
+        width: 300,
+        height: 300,
     }).get(0).getContext('2d');
     let g_nowTime;
-    const g_horizonY = 300;
+    const g_horizonY = 200;
     const setZ = (()=>{
         const m = new Map,
               zMap = new Map;
@@ -137,6 +138,6 @@
     })();
     const g_keys = new Map;
     $(window).on('keydown keyup', ({key, type}) => g_keys.set(key, type === 'keydown'));
-    const tsukinose = new Player('https://i.imgur.com/orQHJ51.png').goto(500 / 2, 0);
+    const tsukinose = new Player('https://i.imgur.com/orQHJ51.png').goto(300 / 2, 0);
     const kuso = new Enemy('https://i.imgur.com/i3AI9Pw.png');
 })();
