@@ -10,62 +10,134 @@
         'util',
         'strToImg'
     ].map(v=>import(`https://rpgen3.github.io/mylib/export/${v}.mjs`))).then(v=>Object.assign({},...v));
+    const undef = void 0;
+    const timer = (func, ms) => {
+        let id, old = 0;
+        const loop = () => {
+            const now = performance.now();
+            if (ms <= now - old) {
+                old = now;
+                func();
+            }
+            id = requestAnimationFrame(loop);
+        };
+        requestAnimationFrame(loop);
+        return () => cancelAnimationFrame(id);
+    };
     const h = $("<body>").appendTo("html").css({
         "text-align": "center",
         padding: "1em"
     });
-    $("<h1>").appendTo(h).text("ツキノセラン製作予定地");
     class Mover {
         constructor(url){
-            this.img = new Image;
-            this.img.src = url;
+            this.x = this.y = 0;
+            this._delete = setZ(this);
+            const img = new Image;
+            img.onload = () => {
+                this.ready = true;
+                if(this.w !== undef && this.h !== undef) return;
+                this.w = img.width;
+                this.h = img.height;
+            };
+            img.src = url;
+            this.img = img;
         }
-        setWH(w,h){
-            this.w = w;
-            this.h = h;
+        update(){
+            if(this.ready) g_ctx.drawImage(this.img, this.x, this.y);
         }
-        jump(x,y){
+        delete(){
+            this._delete();
+        }
+        goto(x,y){
             this.x = x;
             this.y = y;
         }
-        move(x,y){
-            this.x += x;
-            this.y += y;
-        }
-        draw(ctx){
-            ctx.drawImage
-        }
     }
     class Anime extends Mover {
-        constructor(url){
-            super(url);
-            this.anime = 0;
+        constructor(...arg){
+            this.x = this.y = 16;
+            super(...arg);
+            this.anime = 500;
+            this._anime = 0;
         }
-        draw(ctx){
-            const w = this.w / 2,
+        update(){
+            if(!this.ready) return;
+            const {w} = this,
                   ww = w / 2,
                   index = 'wdsa'.indexOf(this.order);
-            ctx.drawImage(this.img, this.anime % 2 * w, index * w, w, w,
-                          this.x - ww, this.y - ww, w, w);
+            g_ctx.drawImage(this.img, this._anime++ % this.anime * w, index * w, w, w,
+                            this.x - ww, this.y - ww, w, w);
         }
     }
-    class Human extends Anime {
+    class Player extends Anime {
+        constructor(...arg){
+            super(...arg);
+            this.gravity = 5;
+            this.horizon = g_horizonY - this.h;
+            this.HP = 3;
+        }
+        update(){
+            if(!this.ready) return;
+            if(!this.jumping && g_keys.get('z')) this.jump();
+            if(this.jumpPower) this.y -= this.jumpPower--;
+            if(this.y < this.horizon) this.y += this.gravity;
+            else this.y = this.horizon;
+            if(!this.hide || g_nowTime % 100 < 50) super.update();
+        }
+        jump(){
+            if(this.jumpPower) return;
+            this.jumpPower = 100;
+            this.anime = 250;
+        }
+        damage(){
+            this.HP--;
+            this.hide = true;
+            timer(() => {
+                this.hide = false;
+            },2000);
+        }
     }
-    class Teki extends Anime {
+    class Enemy extends Anime {
+        update(){
+            if(!this.ready) return;
+            if(this.collision(tsukinose)) tsukinose.damage();
+            super.update();
+        }
         collision(mover){
             const {x,y,w,h} = mover;
             return (this.x - x) ** 2 + (this.y - y) ** 2 <= (this.w/2 + w/2) ** 2;
         }
     }
-    const tsukinose = new Human('https://i.imgur.com/orQHJ51.png');
-    const ctx = $('<canvas>').appendTo(h).prop({
+    const g_gravity = 9.8;
+    const tsukinose = new Player('https://i.imgur.com/orQHJ51.png').goto(500 / 2, 0);
+    const kuso = new Enemy('https://i.imgur.com/i3AI9Pw.png');
+    const g_ctx = $('<canvas>').appendTo(h).prop({
         width: 500,
         height: 500,
     }).get(0).getContext('2d');
-    const drawList = [];
-    const update = () => {
-        for(const v of drawList) v.draw(ctx);
-        requestAnimationFrame(update);
-    };
-    update();
+    let g_nowTime;
+    const g_horizonY = 300;
+    const setZ = (()=>{
+        const m = new Map,
+              zMap = new Map;
+        let sorted = [];
+        const set = (v, z = 0) => {
+            const zz = z;
+            if(zMap.has(z)) z = zMap.get(z);
+            while(m.has(z)) z++;
+            m.set(z, v);
+            zMap.set(zz, z);
+            sorted = [...m.keys()].sort();
+            return () => m.delete(z);
+        };
+        const update = () => {
+            g_nowTime = performance.now();
+            for(const z of sorted) m.get(z).update();
+            requestAnimationFrame(update);
+        };
+        update();
+        return set;
+    })();
+    const g_keys = new Map;
+    $(window).on('keydown keyup', ({key, type}) => g_keys.set(key, type === 'keydown'));
 })();
