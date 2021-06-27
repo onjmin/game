@@ -108,9 +108,6 @@
             return (this.x - x) ** 2 + (this.y - y) ** 2 <= (this.w/2 + w/2) ** 2;
         }
     }
-    const g_gravity = 9.8;
-    const tsukinose = new Player('https://i.imgur.com/orQHJ51.png').goto(500 / 2, 0);
-    const kuso = new Enemy('https://i.imgur.com/i3AI9Pw.png');
     const g_ctx = $('<canvas>').appendTo(h).prop({
         width: 500,
         height: 500,
@@ -140,4 +137,6 @@
     })();
     const g_keys = new Map;
     $(window).on('keydown keyup', ({key, type}) => g_keys.set(key, type === 'keydown'));
+    const tsukinose = new Player('https://i.imgur.com/orQHJ51.png').goto(500 / 2, 0);
+    const kuso = new Enemy('https://i.imgur.com/i3AI9Pw.png');
 })();
