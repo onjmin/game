@@ -48,28 +48,45 @@
         delete(){
             this._delete();
         }
-        goto(x,y){
+        goto(x, y){
             this.x = x;
             this.y = y;
             return this;
+        }
+        move(x, y){
+            this.x += x;
+            this.y += y;
         }
     }
     class Anime extends Mover {
         constructor(...arg){
             super(...arg);
-            this.x = this.y = 16;
+            this.w = this.h = 16 * g_rate;
             this.anime = 500;
-            this._anime = 0;
+            this.direct = 'd';
         }
         update(){
             if(!this.ready) return;
             const {w} = this,
                   ww = w / 2,
-                  index = 'wdsa'.indexOf(this.order);
-            g_ctx.drawImage(this.img, this._anime++ % this.anime * w, index * w, w, w,
-                            this.x - ww, this.y - ww, w, w);
+                  index = 'wdsa'.indexOf(this.direct);
+            const x = g_nowTime % this.anime < this.anime / 2 ? 0 : 1;
+            const unit = 16;
+            g_ctx.drawImage(
+                this.img,
+                x * unit, index * unit, unit, unit,
+                this.x - ww, this.y - ww, w, w
+            );
+        }
+        move(x, y){
+            super.move(x, y);
+            if(x < 0) this.direct = 'a';
+            else if(x > 0) this.direct = 'd';
+            else if(y < 0) this.direct = 'w';
+            else if(y > 0) this.direct = 's';
         }
     }
+    window.a = new Map;
     class Player extends Anime {
         constructor(...arg){
             super(...arg);
@@ -80,15 +97,20 @@
         update(){
             if(!this.ready) return;
             if(!this.jumping && g_keys.get('z')) this.jump();
-            if(this.jumpPower) this.y -= this.jumpPower--;
+            if(g_keys.get('ArrowLeft')) this.move(-5,0);
+            else if(g_keys.get('ArrowRight')) this.move(5,0);
+            if(this._jump) this.y -= this._jump--;
             if(this.y < this.horizon) this.y += this.gravity;
-            else this.y = this.horizon;
+            else {
+                this.y = this.horizon;
+                this.anime = 500;
+            }
             if(!this.hide || g_nowTime % 100 < 50) super.update();
         }
         jump(){
-            if(this.jumpPower) return;
-            this.jumpPower = 100;
-            this.anime = 250;
+            if(this._jump || this.y < this.horizon) return;
+            this._jump = 20;
+            this.anime = 100;
         }
         damage(){
             this.HP--;
@@ -110,11 +132,24 @@
         }
     }
     const g_ctx = $('<canvas>').appendTo(h).prop({
-        width: 300,
-        height: 300,
+        width: 550,
+        height: 550,
     }).get(0).getContext('2d');
+    // ドットを滑らかにしないおまじない
+    g_ctx.mozImageSmoothingEnabled = false;
+    g_ctx.webkitImageSmoothingEnabled = false;
+    g_ctx.msImageSmoothingEnabled = false;
+    g_ctx.imageSmoothingEnabled = false;
     let g_nowTime;
-    const g_horizonY = 200;
+    const g_horizonY = g_ctx.canvas.height - 100;
+    const g_rate = 3;
+    class map {
+        constructor(){
+            const m = new Map,
+                  zMap = new Map;
+            let sorted = [];
+        }
+    }
     const setZ = (()=>{
         const m = new Map,
               zMap = new Map;
@@ -130,6 +165,8 @@
         };
         const update = () => {
             g_nowTime = performance.now();
+            const {width, height} = g_ctx.canvas;
+            g_ctx.clearRect(0, 0, width, height);
             for(const z of sorted) m.get(z).update();
             requestAnimationFrame(update);
         };
@@ -140,4 +177,5 @@
     $(window).on('keydown keyup', ({key, type}) => g_keys.set(key, type === 'keydown'));
     const tsukinose = new Player('https://i.imgur.com/orQHJ51.png').goto(300 / 2, 0);
     const kuso = new Enemy('https://i.imgur.com/i3AI9Pw.png');
+    kuso.goto(50, g_horizonY - kuso.h)
 })();
