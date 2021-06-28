@@ -8,12 +8,13 @@ $("<input>").appendTo('body').attr({
 const load = buffer => {
     const data = new Uint8Array(buffer),
           w = Math.sqrt(data.length * 4 / 3 >> 2) + 1 | 0,
-          len = (w << 1) ** 2,
-          data2 = new Uint8ClampedArray(len),
+          unit = (w << 1) ** 2,
+          data2 = new Uint8ClampedArray(unit),
           width = w,
           height = w;
     console.log(data)
-    for(let i = 0; i < len >> 2; i++){
+    const max = unit >> 2;
+    for(let i = 0; i < max; i++){
         let j = i * 4,
             k = i * 3;
         data2[j] = data[k]
@@ -29,28 +30,30 @@ const load = buffer => {
 const decode = async ctx => {
     const {width, height} = ctx.canvas,
           {data} = ctx.getImageData(0, 0, width, height),
-          len = data.length / 4;
-    const data2 = new Uint8Array(data.length * 3 / 4);
-    const max = len >> 2;
-    let lastIdx = 0;
+          unit = data.length / 4;
+    const data2 = [...new Array(data.length * 3 / 4)];
+    const max = unit;
     for(let i = 0; i < max; i++){
-        let m = max - i - 1,
-            j = m * 3,
-            k = m * 4;
-        const a = data.slice(k , k + 3);
-        data2[j] = a[0];
-        data2[j + 1] = a[1];
-        data2[j + 2] = a[2];
-        if(!lastIdx) continue;
-        const idx = a.indexOf(0);
-        if(idx === -1 || idx === 0) continue;
-        lastIdx = i + idx;
+        let j = i * 3,
+            k = i * 4;
+        data2[j] = data[k]
+        data2[j + 1] = data[k + 1];
+        data2[j + 2] = data[k + 2];
     }
-    console.log(data2.buffer);
+    let data3;
+    for(let i = max * 3 - 1; i >= 0; i--) {
+        let v = data2[i];
+        if(!v) continue;
+        data3 = data2.slice(0, i);
+        break;
+    }
+    console.log(data2)
+    window.a = data3
+    console.log(data3.buffer);
     const audioCtx = new AudioContext,
-          audioBuf = await audioCtx.decodeAudioData(new Uint8Array(data2.slice(0,lastIdx)).buffer),
+          audioBuf = await audioCtx.decodeAudioData(new Uint8Array(data3).buffer),
           src = audioCtx.createBufferSource();
     src.buffer = audioBuf
     src.connect(audioCtx.destination);
-    src.start(0);
+    //src.start(0);
 };
