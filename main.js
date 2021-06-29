@@ -231,7 +231,7 @@
         label: '音量',
         save: true
     });
-    inputVolume.elm.on('change', () => {
+    inputVolume.elm.on('input', () => {
         audio.gain = inputVolume / 100;
         bgm.volume = +inputVolume;
     }).trigger('change');
