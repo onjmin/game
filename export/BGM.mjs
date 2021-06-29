@@ -28,8 +28,8 @@ export class BGM {
     }
     update(){
         if(!this.playing) return;
-        w.getPosition(r => {
-            if(this.end <= r) w.seekTo(this.start);
+        this.w.getPosition(r => {
+            if(this.end <= r) this.w.seekTo(this.start);
         });
     }
 }
