@@ -1,10 +1,11 @@
 (async()=>{
-    await import('https://rpgen3.github.io/lib/lib/jquery-3.5.1.min.js');
-    const rpgen3 = await Promise.all([
+    const {importAll, getScript} = await import('https://rpgen3.github.io/mylib/export/load.mjs');
+    await getScript('https://rpgen3.github.io/lib/lib/jquery-3.5.1.min.js');
+    const rpgen3 = await importAll([
         'input',
         'imgur',
         'strToImg'
-    ].map(v=>import(`https://rpgen3.github.io/mylib/export/${v}.mjs`))).then(v=>Object.assign({},...v));
+    ].map(v => `https://rpgen3.github.io/mylib/export/${v}.mjs`));
     const undef = void 0;
     const html = $('body').css({
         'text-align': 'center',
@@ -216,9 +217,9 @@
         jump: 'vSaXiRd',
         wall: 'DFGjmWF'
     });
-    const rpgen4 = await Promise.all([
+    const rpgen4 = await importAll([
         'BGM'
-    ].map(v=>import(`https://rpgen3.github.io/game/export/${v}.mjs`))).then(v=>Object.assign({},...v));
+    ].map(v => `https://rpgen3.github.io/game/export/${v}.mjs`));
     const bgm = new rpgen4.BGM({
         id: 327497232,
         start: 18,
