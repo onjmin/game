@@ -22,6 +22,9 @@ export class BGM {
         this.playing = false;
         this.w.pause();
     }
+    set volume(v){ // 0 ~ 100
+        scWidget.setVolume(v);
+    }
     update(){
         if(!this.playing) return;
         w.getPosition(r => {
