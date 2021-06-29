@@ -1,4 +1,5 @@
-$.getScript('https://w.soundcloud.com/player/api.js');
+const getScript = url => new Promise((resolve,reject)=>$.getScript(url).done(resolve).fail(reject));
+await $.getScript('https://w.soundcloud.com/player/api.js');
 export class BGM {
     constructor({id,start,end,auto}){
         this.start = start * 1000;
