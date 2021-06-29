@@ -206,7 +206,7 @@
         const obj = {};
         for(const [k, v] of Object.entries(list)){
             obj[k] = () => {};
-            rpgen3.imgur.load(v).then(rpgen3.imgToBuf).then(v=>audio.make(v)).then(buf => {
+            rpgen3.imgur.load(v).then(buf=>audio.make(rpgen3.imgToBuf(buf))).then(buf=>{
                 obj[k] = () => audio.play(buf);
             });
         }
