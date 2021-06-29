@@ -16,7 +16,7 @@
     class Mover {
         constructor(id){
             this.x = this.y = 0;
-            this._delete = z.set(this);
+            this._delete = layer.set(this);
             rpgen3.imgur.load(id).then(img => {
                 this.img = img;
                 if(this.w !== undef && this.h !== undef) return;
@@ -152,7 +152,7 @@
         }
     };
     const g_horizonY = cv.h - 100;
-    const z = new class {
+    const layer = new class {
         constructor(){
             this.m = new Map;
             this._m = new Map;
@@ -173,14 +173,15 @@
     const update = () => {
         g_nowTime = performance.now();
         cv.ctx.clearRect(0, 0, cv.w, cv.h);
-        for(const v of z.sorted) z.m.get(v).update();
+        for(const v of layer.sorted) layer.m.get(v).update();
         requestAnimationFrame(update);
     };
     update();
-    const g_keys = new Map;
+    let g_keys = new Map;
     $(window)
         .on('keydown keyup', ({key, type}) => g_keys.set(key, type === 'keydown'))
-        .on('touchstart touchend', ({type}) => g_keys.set(undef, type === 'touchstart'));
+        .on('touchstart touchend', ({type}) => g_keys.set(undef, type === 'touchstart'))
+        .on('blur contextmenu mouseleave', () => (g_keys = new Map));
     const tsukinose = new Player('orQHJ51').goto(cv.w / 2, 0);
     const kuso = new Enemy('i3AI9Pw');
     kuso.goto(cv.w * 0.1, g_horizonY - kuso.h);
@@ -215,11 +216,22 @@
         jump: 'vSaXiRd',
         wall: 'DFGjmWF'
     });
+    const rpgen4 = await Promise.all([
+        'BGM'
+    ].map(v=>import(`https://rpgen3.github.io/game/export/${v}.mjs`))).then(v=>Object.assign({},...v));
+    const bgm = new rpgen4.BGM({
+        id: 327497232,
+        start: 18,
+        end: 290,
+        auto: true
+    });
+    layer.set(bgm);
     const inputVolume = rpgen3.addInputNum(header,{
         label: '音量',
         save: true
     });
     inputVolume.elm.on('change', () => {
         audio.gain = inputVolume / 100;
+        bgm.volume = +inputVolume;
     }).trigger('change');
 })();
