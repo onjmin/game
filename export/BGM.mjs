@@ -1,4 +1,4 @@
-const getScript = url => new Promise((resolve,reject)=>$.getScript(url).done(resolve).fail(reject));
+const getScript = url => new Promise((resolve,reject) => $.getScript(url).done(resolve).fail(reject));
 await $.getScript('https://w.soundcloud.com/player/api.js');
 export class BGM {
     constructor({id,start,end,auto}){
@@ -24,7 +24,7 @@ export class BGM {
         this.w.pause();
     }
     set volume(v){ // 0 ~ 100
-        scWidget.setVolume(v);
+        this.w.setVolume(v);
     }
     update(){
         if(!this.playing) return;
