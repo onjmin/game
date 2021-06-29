@@ -1,24 +1,18 @@
 (async()=>{
     await import('https://rpgen3.github.io/lib/lib/jquery-3.5.1.min.js');
     const rpgen3 = await Promise.all([
-        'baseN',
-        'css',
-        'hankaku',
-        'random',
-        'save',
-        'url',
-        'util',
+        'imgur',
         'strToImg'
     ].map(v=>import(`https://rpgen3.github.io/mylib/export/${v}.mjs`))).then(v=>Object.assign({},...v));
     const undef = void 0;
-    const h = $("<body>").appendTo("html").css({
-        "text-align": "center",
-        padding: "1em"
+    const h = $('body').css({
+        'text-align': 'center',
+        padding: '1em'
     });
     class Mover {
         constructor(url){
             this.x = this.y = 0;
-            this._delete = setZ(this);
+            this._delete = z.set(this);
             const img = new Image;
             img.onload = () => {
                 this.ready = true;
@@ -30,7 +24,7 @@
             this.img = img;
         }
         update(){
-            if(this.ready) g_ctx.drawImage(this.img, this.x, this.y);
+            if(this.ready) cv.ctx.drawImage(this.img, this.x, this.y);
         }
         delete(){
             this._delete();
@@ -60,7 +54,7 @@
                   index = 'wdsa'.indexOf(this.direct);
             const x = g_nowTime % this.anime < this.anime / 2 ? 0 : 1;
             const unit = 16;
-            g_ctx.drawImage(
+            cv.ctx.drawImage(
                 this.img,
                 x * unit, index * unit, unit, unit,
                 this.x - ww, this.y - ww, w, w
@@ -74,7 +68,6 @@
             else if(y > 0) this.direct = 's';
         }
     }
-    window.a = new Map;
     class Player extends Anime {
         constructor(...arg){
             super(...arg);
@@ -84,7 +77,7 @@
         }
         update(){
             if(!this.ready) return;
-            if(!this.jumping && g_keys.get('z')) this.jump();
+            if(!this.jumping && (g_keys.get('z') || g_keys.get('ArrowUp'))) this.jump();
             if(g_keys.get('ArrowLeft')) this.move(-5,0);
             else if(g_keys.get('ArrowRight')) this.move(5,0);
             if(this._jump) this.y -= this._jump--;
@@ -107,6 +100,7 @@
             setTimeout(() => {
                 this._damage = false;
             },2000);
+            damageSE.start();
         }
     }
     class Enemy extends Anime {
@@ -120,51 +114,57 @@
             return (this.x - x) ** 2 + (this.y - y) ** 2 <= (this.w/2 + w/2) ** 2;
         }
     }
-    const g_ctx = $('<canvas>').appendTo(h).prop({
-        width: 550,
-        height: 550,
-    }).get(0).getContext('2d');
-    // ドットを滑らかにしないおまじない
-    g_ctx.mozImageSmoothingEnabled = false;
-    g_ctx.webkitImageSmoothingEnabled = false;
-    g_ctx.msImageSmoothingEnabled = false;
-    g_ctx.imageSmoothingEnabled = false;
-    let g_nowTime;
-    const g_horizonY = g_ctx.canvas.height - 100;
-    class map {
+    const cv = new class {
         constructor(){
-            const m = new Map,
-                  zMap = new Map;
-            let sorted = [];
+            const ctx = $('<canvas>').appendTo(h).prop({
+                width: 550,
+                height: 550,
+            }).get(0).getContext('2d');
+            this.ctx = ctx;
+            this.w = {
+                valueOf: () => ctx.canvas.width
+            };
+            this.h = {
+                valueOf: () => ctx.canvas.height
+            };
+            // ドットを滑らかにしないおまじない
+            ctx.mozImageSmoothingEnabled = false;
+            ctx.webkitImageSmoothingEnabled = false;
+            ctx.msImageSmoothingEnabled = false;
+            ctx.imageSmoothingEnabled = false;
         }
-    }
-    const setZ = (()=>{
-        const m = new Map,
-              zMap = new Map;
-        let sorted = [];
-        const set = (v, z = 0) => {
-            const zz = z;
-            if(zMap.has(z)) z = zMap.get(z);
+    };
+    const g_horizonY = cv.h - 100;
+    const z = new class {
+        constructor(){
+            this.m = new Map;
+            this._m = new Map;
+            this.sorted = [];
+        }
+        set(v, z = 0){
+            const {m, _m} = this,
+                  zz = z;
+            if(_m.has(z)) z = _m.get(z);
             while(m.has(z)) z++;
             m.set(z, v);
-            zMap.set(zz, z);
-            sorted = [...m.keys()].sort();
+            _m.set(zz, z);
+            this.sorted = [...m.keys()].sort();
             return () => m.delete(z);
         };
-        const update = () => {
-            g_nowTime = performance.now();
-            const {width, height} = g_ctx.canvas;
-            g_ctx.clearRect(0, 0, width, height);
-            for(const z of sorted) m.get(z).update();
-            requestAnimationFrame(update);
-        };
-        update();
-        return set;
-    })();
+    };
+    let g_nowTime;
+    const update = () => {
+        g_nowTime = performance.now();
+        cv.ctx.clearRect(0, 0, cv.w, cv.h);
+        for(const z of z.sorted) z.m.get(z).update();
+        requestAnimationFrame(update);
+    };
+    update();
     const g_keys = new Map;
     $(window).on('keydown keyup', ({key, type}) => g_keys.set(key, type === 'keydown'));
     const tsukinose = new Player('https://i.imgur.com/orQHJ51.png').goto(300 / 2, 0);
     const kuso = new Enemy('https://i.imgur.com/i3AI9Pw.png');
     kuso.goto(50, g_horizonY - kuso.h);
-    window.a = tsukinose;
-})();
+    const damageSE = rpgen3.imgToAudio(await rpgen3.imgur.load('ru01WWV'));
+    const se = 'vSaXiRd'
+    })();
