@@ -87,7 +87,7 @@
             else {
                 this.y = +this.horizon;
                 this.anime = 500;
-                if(g_keys.get('z') || g_keys.get('ArrowUp')) this.jump();
+                if(['ArrowUp','z',undef].some(v=>g_keys.get(v))) this.jump();
             }
             if(this.x < 0) {
                 this.x = 0;
@@ -178,7 +178,9 @@
     };
     update();
     const g_keys = new Map;
-    $(window).on('keydown keyup', ({key, type}) => g_keys.set(key, type === 'keydown'));
+    $(window)
+        .on('keydown keyup', ({key, type}) => g_keys.set(key, type === 'keydown'))
+        .on('touchstart touchend', ({type}) => g_keys.set(undef, type === 'touchstart'));
     const tsukinose = new Player('https://i.imgur.com/orQHJ51.png').goto(300 / 2, 0);
     const kuso = new Enemy('https://i.imgur.com/i3AI9Pw.png');
     kuso.goto(50, g_horizonY - kuso.h);
