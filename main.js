@@ -14,21 +14,18 @@
           body = $('<div>').appendTo(html),
           footer = $('<div>').appendTo(html);
     class Mover {
-        constructor(url){
+        constructor(id){
             this.x = this.y = 0;
             this._delete = z.set(this);
-            const img = new Image;
-            img.onload = () => {
-                this.ready = true;
+            rpgen3.imgur.load(id).then(img => {
+                this.img = img;
                 if(this.w !== undef && this.h !== undef) return;
                 this.w = img.width;
                 this.h = img.height;
-            };
-            img.src = url;
-            this.img = img;
+            });
         }
         update(){
-            if(this.ready) cv.ctx.drawImage(this.img, this.x, this.y);
+            if(this.img) cv.ctx.drawImage(this.img, this.x, this.y);
         }
         delete(){
             this._delete();
@@ -52,7 +49,7 @@
             this.direct = 'd';
         }
         update(){
-            if(!this.ready) return;
+            if(!this.img) return;
             const {w} = this,
                   index = 'wdsa'.indexOf(this.direct);
             const x = g_nowTime % this.anime < this.anime / 2 ? 0 : 1;
@@ -81,7 +78,7 @@
             };
         }
         update(){
-            if(!this.ready) return;
+            if(!this.img) return;
             if(this._jump) this.y -= this._jump--;
             if(this.y < this.horizon) this.y += this.gravity;
             else {
@@ -122,7 +119,7 @@
             this.collide = 1;
         }
         update(){
-            if(!this.ready) return;
+            if(!this.img) return;
             if(this.isCollide(tsukinose)) tsukinose.damage();
             super.update();
         }
@@ -141,16 +138,17 @@
             this.h = {
                 valueOf: () => ctx.canvas.height
             };
+            $(window).on('resize', () => this.resize()).trigger('resize');
+        }
+        resize(){
+            const {ctx} = this;
+            ctx.canvas.width = $(window).width() * 0.9;
+            ctx.canvas.height = $(window).height() * 0.7;
             // ドットを滑らかにしないおまじない
             ctx.mozImageSmoothingEnabled = false;
             ctx.webkitImageSmoothingEnabled = false;
             ctx.msImageSmoothingEnabled = false;
             ctx.imageSmoothingEnabled = false;
-            $(window).on('resize', () => this.resize()).trigger('resize');
-        }
-        resize(){
-            this.ctx.canvas.width = $(window).width() * 0.9;
-            this.ctx.canvas.height = $(window).height() * 0.7;
         }
     };
     const g_horizonY = cv.h - 100;
@@ -183,8 +181,8 @@
     $(window)
         .on('keydown keyup', ({key, type}) => g_keys.set(key, type === 'keydown'))
         .on('touchstart touchend', ({type}) => g_keys.set(undef, type === 'touchstart'));
-    const tsukinose = new Player('https://i.imgur.com/orQHJ51.png').goto(300 / 2, 0);
-    const kuso = new Enemy('https://i.imgur.com/i3AI9Pw.png');
+    const tsukinose = new Player('orQHJ51').goto(300 / 2, 0);
+    const kuso = new Enemy('i3AI9Pw');
     kuso.goto(50, g_horizonY - kuso.h);
     const audio = new class {
         constructor(){
