@@ -1,14 +1,18 @@
 (async()=>{
     await import('https://rpgen3.github.io/lib/lib/jquery-3.5.1.min.js');
     const rpgen3 = await Promise.all([
+        'input',
         'imgur',
         'strToImg'
     ].map(v=>import(`https://rpgen3.github.io/mylib/export/${v}.mjs`))).then(v=>Object.assign({},...v));
     const undef = void 0;
-    const h = $('body').css({
+    const html = $('body').css({
         'text-align': 'center',
         padding: '1em'
     });
+    const header = $('<div>').appendTo(html),
+          body = $('<div>').appendTo(html),
+          footer = $('<div>').appendTo(html);
     class Mover {
         constructor(url){
             this.x = this.y = 0;
@@ -50,14 +54,13 @@
         update(){
             if(!this.ready) return;
             const {w} = this,
-                  ww = w / 2,
                   index = 'wdsa'.indexOf(this.direct);
             const x = g_nowTime % this.anime < this.anime / 2 ? 0 : 1;
             const unit = 16;
             cv.ctx.drawImage(
                 this.img,
                 x * unit, index * unit, unit, unit,
-                this.x - ww, this.y - ww, w, w
+                this.x, this.y, w, w
             );
         }
         move(x, y){
@@ -72,26 +75,36 @@
         constructor(...arg){
             super(...arg);
             this.gravity = 5;
-            this.horizon = g_horizonY - this.h;
             this.HP = 3;
+            this.horizon = {
+                valueOf: () => g_horizonY - this.h
+            };
         }
         update(){
             if(!this.ready) return;
-            if(!this.jumping && (g_keys.get('z') || g_keys.get('ArrowUp'))) this.jump();
-            if(g_keys.get('ArrowLeft')) this.move(-5,0);
-            else if(g_keys.get('ArrowRight')) this.move(5,0);
             if(this._jump) this.y -= this._jump--;
             if(this.y < this.horizon) this.y += this.gravity;
             else {
-                this.y = this.horizon;
+                this.y = +this.horizon;
                 this.anime = 500;
+                if(g_keys.get('z') || g_keys.get('ArrowUp')) this.jump();
             }
+            if(this.x < 0) {
+                this.x = 0;
+                SE.wall();
+            }
+            else if(g_keys.get('ArrowLeft')) this.move(-5,0);
+            if(this.x + this.w > cv.w) {
+                this.x = cv.w - this.w;
+                SE.wall();
+            }
+            else if(g_keys.get('ArrowRight')) this.move(5,0);
             if(!this._damage || g_nowTime % 200 < 100) super.update();
         }
         jump(){
-            if(this._jump || this.y < this.horizon) return;
             this._jump = 20;
             this.anime = 100;
+            SE.jump();
         }
         damage(){
             if(this._damage) return;
@@ -100,23 +113,27 @@
             setTimeout(() => {
                 this._damage = false;
             },2000);
-            damageSE.start();
+            SE.damage();
         }
     }
     class Enemy extends Anime {
+        constructor(...arg){
+            super(...arg);
+            this.collide = 1;
+        }
         update(){
             if(!this.ready) return;
-            if(this.collision(tsukinose)) tsukinose.damage();
+            if(this.isCollide(tsukinose)) tsukinose.damage();
             super.update();
         }
-        collision(mover){
+        isCollide(mover){
             const {x,y,w,h} = mover;
-            return (this.x - x) ** 2 + (this.y - y) ** 2 <= (this.w/2 + w/2) ** 2;
+            return this.collide * ((this.x - x) ** 2 + (this.y - y) ** 2) <= (this.w/2 + w/2) ** 2;
         }
     }
     const cv = new class {
         constructor(){
-            const ctx = $('<canvas>').appendTo(h).prop({
+            const ctx = $('<canvas>').appendTo(footer).prop({
                 width: 550,
                 height: 550,
             }).get(0).getContext('2d');
@@ -156,7 +173,7 @@
     const update = () => {
         g_nowTime = performance.now();
         cv.ctx.clearRect(0, 0, cv.w, cv.h);
-        for(const z of z.sorted) z.m.get(z).update();
+        for(const v of z.sorted) z.m.get(v).update();
         requestAnimationFrame(update);
     };
     update();
@@ -165,6 +182,45 @@
     const tsukinose = new Player('https://i.imgur.com/orQHJ51.png').goto(300 / 2, 0);
     const kuso = new Enemy('https://i.imgur.com/i3AI9Pw.png');
     kuso.goto(50, g_horizonY - kuso.h);
-    const damageSE = rpgen3.imgToAudio(await rpgen3.imgur.load('ru01WWV'));
-    const se = 'vSaXiRd'
-    })();
+    const audio = new class {
+        constructor(){
+            const ctx = new AudioContext;
+            this.ctx = ctx;
+            this._gain = ctx.createGain()
+        }
+        set gain(v){
+            this._gain.gain.value = v;
+        }
+        make(buf){
+            return this.ctx.decodeAudioData(buf);
+        }
+        play(buf){
+            const {ctx, _gain} = this,
+                  src = ctx.createBufferSource();
+            src.buffer = buf;
+            src.connect(_gain).connect(ctx.destination);
+            src.start();
+        }
+    };
+    const SE = (list => {
+        const obj = {};
+        for(const [k, v] of Object.entries(list)){
+            obj[k] = () => {};
+            rpgen3.imgur.load(v).then(rpgen3.imgToBuf).then(v=>audio.make(v)).then(buf => {
+                obj[k] = () => audio.play(buf);
+            });
+        }
+        return obj;
+    })({
+        damage: 'ru01WWV',
+        jump: 'vSaXiRd',
+        wall: 'DFGjmWF'
+    });
+    const inputVolume = rpgen3.addInputNum(header,{
+        label: '音量',
+        save: true
+    });
+    inputVolume.elm.on('change', () => {
+        audio.gain = inputVolume / 100;
+    }).trigger('change');
+})();
