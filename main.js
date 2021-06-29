@@ -181,9 +181,9 @@
     $(window)
         .on('keydown keyup', ({key, type}) => g_keys.set(key, type === 'keydown'))
         .on('touchstart touchend', ({type}) => g_keys.set(undef, type === 'touchstart'));
-    const tsukinose = new Player('orQHJ51').goto(300 / 2, 0);
+    const tsukinose = new Player('orQHJ51').goto(cv.w / 2, 0);
     const kuso = new Enemy('i3AI9Pw');
-    kuso.goto(50, g_horizonY - kuso.h);
+    kuso.goto(cv.w * 0.1, g_horizonY - kuso.h);
     const audio = new class {
         constructor(){
             const ctx = new AudioContext;
