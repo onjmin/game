@@ -88,12 +88,12 @@
             }
             if(this.x < 0) {
                 this.x = 0;
-                SE.wall();
+                SE?.wall();
             }
             else if(g_keys.get('ArrowLeft')) this.move(-5,0);
             if(this.x + this.w > cv.w) {
                 this.x = cv.w - this.w;
-                SE.wall();
+                SE?.wall();
             }
             else if(g_keys.get('ArrowRight')) this.move(5,0);
             if(!this._damage || g_nowTime % 200 < 100) super.update();
@@ -101,7 +101,7 @@
         jump(){
             this._jump = 20;
             this.anime = 100;
-            SE.jump();
+            SE?.jump();
         }
         damage(){
             if(this._damage) return;
@@ -110,7 +110,7 @@
             setTimeout(() => {
                 this._damage = false;
             },2000);
-            SE.damage();
+            SE?.damage();
         }
     }
     class Enemy extends Anime {
@@ -206,12 +206,9 @@
     };
     const SE = (list => {
         const obj = {};
-        for(const [k, v] of Object.entries(list)){
-            obj[k] = () => {};
-            rpgen3.imgur.load(v).then(buf=>audio.make(rpgen3.imgToBuf(buf))).then(buf=>{
-                obj[k] = () => audio.play(buf);
-            });
-        }
+        for(const [k, v] of Object.entries(list)) rpgen3.imgur.load(v).then(buf=>audio.make(rpgen3.imgToBuf(buf))).then(buf=>{
+            obj[k] = () => audio.play(buf);
+        });
         return obj;
     })({
         damage: 'ru01WWV',
