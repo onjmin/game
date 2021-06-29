@@ -1,4 +1,4 @@
-import {load} from 'https://rpgen3.github.io/mylib/export/imgur.mjs';
+import {imgur} from 'https://rpgen3.github.io/mylib/export/imgur.mjs';
 import {imgToBuf} from 'https://rpgen3.github.io/mylib/export/strToImg.mjs';
 export const audio = new class {
     constructor(){
@@ -20,14 +20,10 @@ export const audio = new class {
         src.start();
     }
 };
-export const SE = (list => {
+export const SE = list => {
     const obj = {};
     for(const [k, v] of Object.entries(list)) imgur.load(v).then(buf=>audio.make(imgToBuf(buf))).then(buf=>{
         obj[k] = () => audio.play(buf);
     });
     return obj;
-})({
-    damage: 'ru01WWV',
-    jump: 'vSaXiRd',
-    wall: 'DFGjmWF'
-});
+};
