@@ -20,4 +20,4 @@ export class canvas {
         ctx.msImageSmoothingEnabled = false;
         ctx.imageSmoothingEnabled = false;
     }
-};
+}
