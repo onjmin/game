@@ -133,10 +133,7 @@
     }
     const cv = new class {
         constructor(){
-            const ctx = $('<canvas>').appendTo(footer).prop({
-                width: 550,
-                height: 550,
-            }).get(0).getContext('2d');
+            const ctx = $('<canvas>').appendTo(footer).get(0).getContext('2d');
             this.ctx = ctx;
             this.w = {
                 valueOf: () => ctx.canvas.width
@@ -149,6 +146,11 @@
             ctx.webkitImageSmoothingEnabled = false;
             ctx.msImageSmoothingEnabled = false;
             ctx.imageSmoothingEnabled = false;
+            $(window).on('resize', () => this.resize()).trigger('resize');
+        }
+        resize(){
+            this.ctx.canvas.width = $(window).width() * 0.9;
+            this.ctx.canvas.height = $(window).height() * 0.7;
         }
     };
     const g_horizonY = cv.h - 100;
