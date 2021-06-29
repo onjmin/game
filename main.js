@@ -77,6 +77,7 @@
             this.horizon = {
                 valueOf: () => g_horizonY - this.h
             };
+            this._wall = 0;
         }
         update(){
             if(!this.img) return;
@@ -85,18 +86,18 @@
             else {
                 this.y = +this.horizon;
                 this.anime = 500;
-                if(['ArrowUp','z',undef].some(v=>g_keys.get(v))) this.jump();
+                if(isKeyDown(['ArrowUp','z','w',' ',undef])) this.jump();
             }
             if(this.x < 0) {
                 this.x = 0;
-                SE?.wall();
+                this.wall();
             }
-            else if(g_keys.get('ArrowLeft')) this.move(-5,0);
+            else if(isKeyDown(['ArrowLeft','a'])) this.move(-5,0);
             if(this.x + this.w > cv.w) {
                 this.x = cv.w - this.w;
-                SE?.wall();
+                this.wall();
             }
-            else if(g_keys.get('ArrowRight')) this.move(5,0);
+            else if(isKeyDown(['ArrowRight','d'])) this.move(5,0);
             if(!this._damage || g_nowTime % 200 < 100) super.update();
         }
         jump(){
@@ -112,6 +113,11 @@
                 this._damage = false;
             },2000);
             SE?.damage();
+        }
+        wall(){
+            if(g_nowTime - this._wall < 1000) return;
+            this._wall = g_nowTime;
+            SE?.wall();
         }
     }
     class Enemy extends Anime {
@@ -129,47 +135,16 @@
             return this.collide * ((this.x - x) ** 2 + (this.y - y) ** 2) <= (this.w/2 + w/2) ** 2;
         }
     }
-    const cv = new class {
-        constructor(){
-            const ctx = $('<canvas>').appendTo(footer).get(0).getContext('2d');
-            this.ctx = ctx;
-            this.w = {
-                valueOf: () => ctx.canvas.width
-            };
-            this.h = {
-                valueOf: () => ctx.canvas.height
-            };
-            $(window).on('resize', () => this.resize()).trigger('resize');
-        }
-        resize(){
-            const {ctx} = this;
-            ctx.canvas.width = $(window).width() * 0.9;
-            ctx.canvas.height = $(window).height() * 0.7;
-            // ドットを滑らかにしないおまじない
-            ctx.mozImageSmoothingEnabled = false;
-            ctx.webkitImageSmoothingEnabled = false;
-            ctx.msImageSmoothingEnabled = false;
-            ctx.imageSmoothingEnabled = false;
-        }
-    };
-    const g_horizonY = cv.h - 100;
-    const layer = new class {
-        constructor(){
-            this.m = new Map;
-            this._m = new Map;
-            this.sorted = [];
-        }
-        set(v, z = 0){
-            const {m, _m} = this,
-                  zz = z;
-            if(_m.has(z)) z = _m.get(z);
-            while(m.has(z)) z++;
-            m.set(z, v);
-            _m.set(zz, z);
-            this.sorted = [...m.keys()].sort();
-            return () => m.delete(z);
-        };
-    };
+    const rpgen4 = await importAll([
+        'isKeyDown',
+        'canvas',
+        'layer',
+        'BGM',
+        'SE'
+    ].map(v => `https://rpgen3.github.io/game/export/${v}.mjs`));
+    const {layer, isKeyDown} = rpgen4,
+          cv = new rpgen4.canvas(footer),
+          g_horizonY = cv.h - 100;
     let g_nowTime;
     const update = () => {
         g_nowTime = performance.now();
@@ -178,61 +153,27 @@
         requestAnimationFrame(update);
     };
     update();
-    let g_keys = new Map;
-    $(window)
-        .on('keydown keyup', ({key, type}) => g_keys.set(key, type === 'keydown'))
-        .on('touchstart touchend', ({type}) => g_keys.set(undef, type === 'touchstart'))
-        .on('blur contextmenu mouseleave', () => (g_keys = new Map));
-    const tsukinose = new Player('orQHJ51').goto(cv.w / 2, 0);
-    const kuso = new Enemy('i3AI9Pw');
-    kuso.goto(cv.w * 0.1, g_horizonY - kuso.h);
-    const audio = new class {
-        constructor(){
-            const ctx = new AudioContext;
-            this.ctx = ctx;
-            this._gain = ctx.createGain()
-        }
-        set gain(v){
-            this._gain.gain.value = v;
-        }
-        make(buf){
-            return this.ctx.decodeAudioData(buf);
-        }
-        play(buf){
-            const {ctx, _gain} = this,
-                  src = ctx.createBufferSource();
-            src.buffer = buf;
-            src.connect(_gain).connect(ctx.destination);
-            src.start();
-        }
-    };
-    const SE = (list => {
-        const obj = {};
-        for(const [k, v] of Object.entries(list)) rpgen3.imgur.load(v).then(buf=>audio.make(rpgen3.imgToBuf(buf))).then(buf=>{
-            obj[k] = () => audio.play(buf);
-        });
-        return obj;
-    })({
-        damage: 'ru01WWV',
-        jump: 'vSaXiRd',
-        wall: 'DFGjmWF'
-    });
-    const rpgen4 = await importAll([
-        'BGM'
-    ].map(v => `https://rpgen3.github.io/game/export/${v}.mjs`));
-    const bgm = new rpgen4.BGM({
+    const BGM = new rpgen4.BGM({
         id: 327497232,
         start: 18,
         end: 290,
         auto: true
     });
-    layer.set(bgm);
+    layer.set(BGM);
+    const SE = rpgen4.SE({
+        damage: 'ru01WWV',
+        jump: 'vSaXiRd',
+        wall: 'DFGjmWF'
+    });
     const inputVolume = rpgen3.addInputNum(header,{
         label: '音量',
         save: true
     });
     inputVolume.elm.on('input', () => {
-        audio.gain = inputVolume / 100;
-        bgm.volume = +inputVolume;
-    }).trigger('change');
+        rpgen4.audio.gain = inputVolume / 100;
+        BGM.volume = +inputVolume;
+    }).trigger('input');
+    const tsukinose = new Player('orQHJ51').goto(cv.w / 2, 0);
+    const kuso = new Enemy('i3AI9Pw');
+    kuso.goto(cv.w * 0.1, g_horizonY - kuso.h);
 })();
