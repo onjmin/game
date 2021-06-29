@@ -1,5 +1,5 @@
-const getScript = url => new Promise((resolve,reject) => $.getScript(url).done(resolve).fail(reject));
-await $.getScript('https://w.soundcloud.com/player/api.js');
+import {getScript} from 'https://rpgen3.github.io/mylib/export/load.mjs';
+await getScript('https://w.soundcloud.com/player/api.js');
 export class BGM {
     constructor({id,start,end,auto}){
         this.start = start * 1000;
