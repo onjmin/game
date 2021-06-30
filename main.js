@@ -17,7 +17,7 @@
     class Mover {
         constructor(id){
             this.x = this.y = 0;
-            this._delete = layer.set(this);
+            this.z = 0;
             rpgen3.imgur.load(id).then(img => {
                 this.img = img;
                 if(this.w !== undef && this.h !== undef) return;
@@ -25,11 +25,12 @@
                 this.h = img.height;
             });
         }
+        set z(v){
+            if(this.delete) this.delete();
+            this.delete = layer.set(this, v);
+        }
         update(ctx){
             if(this.img) ctx.drawImage(this.img, this.x, this.y);
-        }
-        delete(){
-            this._delete();
         }
         goto(x, y){
             this.x = x;
@@ -50,15 +51,15 @@
             this.direct = 'd';
         }
         update(ctx){
-            if(!this.img) return;
-            const {w} = this,
-                  index = 'wdsa'.indexOf(this.direct);
-            const x = g_nowTime % this.anime < this.anime / 2 ? 0 : 1;
-            const unit = 16;
+            if(!this.img || this.hide) return;
+            const {img, x, y, w, anime, direct} = this,
+                  index = 'wdsa'.indexOf(direct),
+                  xx = g_nowTime % anime < anime / 2 ? 0 : 1,
+                  unit = 16;
             ctx.drawImage(
-                this.img,
-                x * unit, index * unit, unit, unit,
-                this.x, this.y, w, w
+                img,
+                xx * unit, index * unit, unit, unit,
+                x, y, w, w
             );
         }
         move(x, y){
@@ -69,25 +70,41 @@
             else if(y > 0) this.direct = 's';
         }
     }
-    class Player extends Anime {
+    class Falling extends Anime {
         constructor(...arg){
             super(...arg);
             this.gravity = 5;
-            this.HP = 3;
             this.horizon = {
                 valueOf: () => g_horizonY - this.h
             };
-            this._wall = 0;
         }
         update(ctx){
             if(!this.img) return;
             if(this._jump) this.y -= this._jump--;
             if(this.y < this.horizon) this.y += this.gravity;
             else {
+                this._jump = null;
                 this.y = +this.horizon;
                 this.anime = 500;
-                if(isKeyDown(['ArrowUp','z','w',' ',undef])) this.jump();
             }
+            super.update(ctx);
+        }
+        jump(){
+            if(this._jump !== null) return;
+            this._jump = 20;
+            this.anime = 100;
+            return true;
+        }
+    }
+    class Player extends Falling {
+        constructor(...arg){
+            super(...arg);
+            this.HP = 3;
+            this._wall = 0;
+        }
+        update(ctx){
+            if(!this.img) return;
+            if(isKeyDown(['ArrowUp','z','w',' ',undef])) this.jump();
             if(isKeyDown(['ArrowLeft','a'])) this.move(-5,0);
             if(this.x < 0) {
                 this.x = 0;
@@ -98,12 +115,11 @@
                 this.x = cv.w - this.w;
                 this.wall();
             }
-            if(!this._damage || g_nowTime % 200 < 100) super.update(ctx);
+            this.hide = this._damage && g_nowTime % 200 < 100;
+            super.update(ctx);
         }
         jump(){
-            this._jump = 20;
-            this.anime = 100;
-            SE?.jump();
+            if(super.jump()) SE.jump?.();
         }
         damage(){
             if(this._damage) return;
@@ -112,15 +128,15 @@
             setTimeout(() => {
                 this._damage = false;
             },2000);
-            SE?.damage();
+            SE.damage?.();
         }
         wall(){
             if(g_nowTime - this._wall < 1000) return;
             this._wall = g_nowTime;
-            SE?.wall();
+            SE.wall?.();
         }
     }
-    class Enemy extends Anime {
+    class Enemy extends Falling {
         constructor(...arg){
             super(...arg);
             this.collide = 1;
@@ -128,6 +144,10 @@
         update(ctx){
             if(!this.img) return;
             if(this.isCollide(tsukinose)) tsukinose.damage();
+            this.move(-5, 0);
+            if(this.x + this.w < 0) this.x = cv.w;
+            if(Math.random() < 0.01) this.jump();
+            if(Math.random() < 0.001) spawnTeki();
             super.update(ctx);
         }
         isCollide(mover){
@@ -173,12 +193,12 @@
         requestAnimationFrame(update);
     };
     update();
-    const BGM = new rpgen4.BGM({
+    const BGM = rpgen4.BGM ? new rpgen4.BGM({
         id: 327497232,
         start: 18,
         end: 290,
         auto: true
-    });
+    }) : null;
     layer.set(BGM);
     const SE = rpgen4.SE({
         damage: 'ru01WWV',
@@ -191,11 +211,12 @@
     });
     inputVolume.elm.on('input', () => {
         rpgen4.audio.gain = inputVolume / 100;
-        BGM.volume = +inputVolume;
+        if(BGM) BGM.volume = +inputVolume;
     }).trigger('input');
-    const tsukinose = new Player('orQHJ51').goto(cv.w / 2 - 8, 0);
-    const kuso = new Enemy('i3AI9Pw');
-    kuso.goto(cv.w * 0.1, g_horizonY - kuso.h);
+    const tsukinose = new Player('orQHJ51').goto(16, 0);
+    tsukinose.z = 100;
+    const spawnTeki = () => new Enemy('i3AI9Pw').goto(cv.w * 3, 0);
+    spawnTeki();
     new SimpleText({
         text: {
             toString: () => `HP：${tsukinose.HP}`
