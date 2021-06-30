@@ -157,9 +157,8 @@
         }
     }
     class SimpleText {
-        constructor({x = 0, y = 0, text = '', color = 'black', size = 16}){
-            this.x = x;
-            this.y = y;
+        constructor({text = '', color = 'black', size = 16}){
+            this.x = this.y = 0;
             this.text = text;
             this.color = color;
             this.size = size;
@@ -172,6 +171,11 @@
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             ctx.fillText(text, x, y);
+        }
+        goto(x, y){
+            this.x = x;
+            this.y = y;
+            return this;
         }
     }
     const rpgen4 = await importAllSettled([
@@ -231,7 +235,6 @@
         text: {
             toString: () => `time：${g_nowTime | 0}`
         },
-        size: 30,
-        y: 30,
-    });
+        size: 30
+    }).goto(0, 30);
 })();
