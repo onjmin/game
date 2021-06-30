@@ -1,5 +1,5 @@
 (async()=>{
-    const {importAll, getScript} = await import('https://rpgen3.github.io/mylib/export/load.mjs');
+    const {importAll, importAllSettled, getScript} = await import('https://rpgen3.github.io/mylib/export/import.mjs');
     await getScript('https://rpgen3.github.io/lib/lib/jquery-3.5.1.min.js');
     const rpgen3 = await importAll([
         'input',
@@ -153,7 +153,7 @@
             ctx.fillText(text, x, y);
         }
     }
-    const rpgen4 = await importAll([
+    const rpgen4 = await importAllSettled([
         'isKeyDown',
         'canvas',
         'layer',
@@ -193,7 +193,7 @@
         rpgen4.audio.gain = inputVolume / 100;
         BGM.volume = +inputVolume;
     }).trigger('input');
-    const tsukinose = new Player('orQHJ51').goto(cv.w / 2, 0);
+    const tsukinose = new Player('orQHJ51').goto(cv.w / 2 - 8, 0);
     const kuso = new Enemy('i3AI9Pw');
     kuso.goto(cv.w * 0.1, g_horizonY - kuso.h);
     new SimpleText({
