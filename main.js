@@ -215,10 +215,9 @@
     }).trigger('input');
     const tsukinose = new Player('orQHJ51').goto(16, 0);
     tsukinose.z = 100;
-    window.layer = layer
     const spawnTeki = (()=>{
         let i = 0;
-        return () => i < 5 && ++i && new Enemy('i3AI9Pw').goto(cv.w + 1000, 0);
+        return () => i < cv.w / 200 && ++i && new Enemy('i3AI9Pw').goto(cv.w + 1000, 0);
     })();
     spawnTeki();
     new SimpleText({
