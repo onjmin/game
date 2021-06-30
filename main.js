@@ -9,7 +9,8 @@
     const undef = void 0;
     const html = $('body').css({
         'text-align': 'center',
-        padding: '1em'
+        padding: '1em',
+        'user-select': 'none'
     });
     const header = $('<div>').appendTo(html),
           body = $('<div>').appendTo(html),
@@ -217,7 +218,7 @@
     tsukinose.z = 100;
     const spawnTeki = (()=>{
         let i = 0;
-        return () => i < cv.w / 200 && ++i && new Enemy('i3AI9Pw').goto(cv.w + 1000, 0);
+        return () => i < cv.w / 400 && ++i && new Enemy('i3AI9Pw').goto(cv.w + 1000, 0);
     })();
     spawnTeki();
     new SimpleText({
