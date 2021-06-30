@@ -147,7 +147,7 @@
             if(this.isCollide(tsukinose)) tsukinose.damage();
             this.move(-5, 0);
             if(this.x + this.w < 0) this.x = cv.w;
-            if(Math.random() < 0.01) this.jump();
+            if(Math.random() < 0.001) this.jump();
             if(Math.random() < 0.001) spawnTeki();
             super.update(ctx);
         }
@@ -218,7 +218,7 @@
     tsukinose.z = 100;
     const spawnTeki = (()=>{
         let i = 0;
-        return () => i < cv.w / 400 && ++i && new Enemy('i3AI9Pw').goto(cv.w + 1000, 0);
+        return () => i < cv.w / 600 + 1 && ++i && new Enemy('i3AI9Pw').goto(cv.w + 1000, 0);
     })();
     spawnTeki();
     new SimpleText({
