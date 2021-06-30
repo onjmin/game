@@ -1,5 +1,5 @@
 const undef = void 0;
-export class List {
+export class SortedList {
     constructor(){
         this.start = {};
     }
