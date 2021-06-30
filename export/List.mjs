@@ -1,10 +1,10 @@
 const undef = void 0;
 export class List {
     constructor(){
-        this.start = {};
+        this.next = {};
     }
     add(value){
-        let now = this.start;
+        let now = this;
         while(true){
             const {next} = now;
             if(next === undef) return (now.next = {value});
@@ -13,7 +13,7 @@ export class List {
         }
     }
     delete(value){
-        let now = this.start;
+        let now = this;
         while(true){
             const {next} = now;
             if(next === undef) return;
