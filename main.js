@@ -189,7 +189,7 @@
     const update = () => {
         g_nowTime = performance.now();
         cv.ctx.clearRect(0, 0, cv.w, cv.h);
-        for(const v of layer.sorted) layer.m.get(v).update(cv.ctx);
+        layer.forEach(v => v.update(cv.ctx));
         requestAnimationFrame(update);
     };
     update();
@@ -215,7 +215,11 @@
     }).trigger('input');
     const tsukinose = new Player('orQHJ51').goto(16, 0);
     tsukinose.z = 100;
-    const spawnTeki = () => new Enemy('i3AI9Pw').goto(cv.w * 3, 0);
+    window.layer = layer
+    const spawnTeki = (()=>{
+        let i = 0;
+        return () => i < 5 && ++i && new Enemy('i3AI9Pw').goto(cv.w + 1000, 0);
+    })();
     spawnTeki();
     new SimpleText({
         text: {
