@@ -14,17 +14,23 @@ export class BGM {
         this.w = w;
         if(auto) w.bind(SC.Widget.Events.READY, () => this.play());
         w.bind(SC.Widget.Events.FINISH, () => w.seekTo(0).play());
+        this._v = 100;
     }
     play(){
         this.playing = true;
         this.w.play();
+        this.setVolume();
     }
     stop(){
         this.playing = false;
         this.w.pause();
     }
     set volume(v){ // 0 ~ 100
-        this.w.setVolume(v);
+        this._v = v;
+        this.setVolume();
+    }
+    setVolume(){
+        this.w.setVolume(this._v);
     }
     update(){
         if(!this.playing) return;
