@@ -1,5 +1,5 @@
 import {List} from 'https://rpgen3.github.io/game/export/List.mjs';
-const layer = new class {
+export const layer = new class {
     constructor(){
         this.m = new Map;
         this._m = new Map;
