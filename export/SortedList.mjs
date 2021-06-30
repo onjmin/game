@@ -8,7 +8,7 @@ export class SortedList {
         while(true){
             const {next} = now;
             if(next === undef) return (now.next = {value});
-            else if(next.value < value) return (now.next = {value, next});
+            else if(next.value > value) return (now.next = {value, next});
             now = next;
         }
     }
