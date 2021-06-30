@@ -11,7 +11,13 @@ export const layer = new class {
         while(m.has(z)) z++;
         m.set(z, v);
         _m.set(zz, z);
-        this.sorted = [...m.keys()].sort();
-        return () => m.delete(z);
-    };
+        this.sort();
+        return () => {
+            m.delete(z);
+            this.sort();
+        };
+    }
+    sort(){
+        this.sorted = [...this.m.keys()].sort();
+    }
 };
