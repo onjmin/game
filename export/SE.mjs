@@ -22,11 +22,8 @@ export const audio = new class {
 };
 export const SE = list => {
     const obj = {};
-    for(const [k, v] of Object.entries(list)) {
-        obj[k] = () => {};
-        imgur.load(v).then(buf=>audio.make(imgToBuf(buf))).then(buf=>{
-            obj[k] = () => audio.play(buf);
-        });
-    }
+    for(const [k, v] of Object.entries(list)) imgur.load(v).then(buf=>audio.make(imgToBuf(buf))).then(buf=>{
+        obj[k] = () => audio.play(buf);
+    });
     return obj;
 };
