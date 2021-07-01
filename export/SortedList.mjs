@@ -25,7 +25,7 @@ export class SortedList {
         while(true){
             const {next} = now;
             if(!next) break;
-            func(next.value);
+            else func(next.value);
             now = next;
         }
     }
