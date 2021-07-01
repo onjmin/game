@@ -1,4 +1,3 @@
-const undef = void 0;
 export class SortedList {
     constructor(){
         this.list = {};
@@ -26,7 +25,7 @@ export class SortedList {
         while(true){
             const {next} = now;
             if(!next) return;
-            else if(next.value !== undef) func(next.value);
+            else if(next.value !== void 0) func(next.value);
             now = next;
         }
     }
