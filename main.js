@@ -153,7 +153,7 @@
         }
         isCollide(mover){
             const {x,y,w,h} = mover;
-            return this.collide * ((this.x - x) ** 2 + (this.y - y) ** 2) <= (this.w/2 + w/2) ** 2;
+            return (this.x - x) ** 2 + (this.y - y) ** 2 <= ((this.w/2 + w/2) ** 2) * this.collide;
         }
     }
     class SimpleText {
@@ -204,7 +204,7 @@
         end: 290,
         auto: true
     }) : null;
-    layer.set(BGM);
+    if(BGM) layer.set(BGM);
     const SE = rpgen4.SE({
         damage: 'ru01WWV',
         jump: 'vSaXiRd',
@@ -222,7 +222,7 @@
     tsukinose.z = 100;
     const spawnTeki = (()=>{
         let i = 0;
-        return () => i < cv.w / 600 + 1 && ++i && new Enemy('i3AI9Pw').goto(cv.w + 1000, 0);
+        return () => i < cv.w / 600 + 1 && ++i && (new Enemy('i3AI9Pw').goto(cv.w + 1000, 0).collide = 0.1);
     })();
     spawnTeki();
     new SimpleText({
