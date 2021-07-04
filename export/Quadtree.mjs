@@ -15,11 +15,10 @@ const calcMostBit = n => { // 最上位ビットの位置
     return i;
 };
 const layerNum = 5,
-      width = 500, // ゲーム画面の幅と高さ
-      U = width / 2 ** (layerNum - 1); // 単位長
+      splitNum = 2 ** (layerNum - 1); // 縦横の分割数
 const toXY = xy => {
     const ar = [];
-    for(const v of xy) ar.push(v / U | 0);
+    for(let i = 0; i < 2; i++) ar.push(xy[i] / (cv[i ? 'h' : 'w'] / splitNum) | 0);
     return ar;
 };
 const layerFirstIndex = [...new Array(layerNum + 1).keys()].map(i => (4 ** i - 1) / 3);
