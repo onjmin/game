@@ -28,7 +28,7 @@ const toIndex = (wa, sd) => { // 座標からtreeのIndexを計算
           L = bit >> 1;
     return (a >> bit) + layerFirstIndex[layerNum - L - 1];
 };
-const tree = [...new Array(layerFirstIndex[layerNum + 1])].map(() => new LinkedList());
+const tree = [...new Array(layerFirstIndex[layerNum])].map(() => new LinkedList());
 const roadMap = (()=>{
     const ar = [],
           max = layerFirstIndex[layerNum] - 1;
