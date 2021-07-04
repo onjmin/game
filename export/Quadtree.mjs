@@ -16,9 +16,10 @@ const calcMostBit = n => { // 最上位ビットの位置
 };
 const layerNum = 5,
       splitNum = 2 ** (layerNum - 1); // 縦横の分割数
+let g_cv;
 const toXY = xy => {
     const ar = [];
-    for(let i = 0; i < 2; i++) ar.push(xy[i] / (cv[i ? 'h' : 'w'] / splitNum) | 0);
+    for(let i = 0; i < 2; i++) ar.push(xy[i] / (g_cv[i ? 'h' : 'w'] / splitNum) | 0);
     return ar;
 };
 const layerFirstIndex = [...new Array(layerNum + 1).keys()].map(i => (4 ** i - 1) / 3);
@@ -85,5 +86,8 @@ export class Quadtree {
     }
     static check(){
         check(tree);
+    }
+    static setCV(cv){
+        g_cv = cv;
     }
 }
