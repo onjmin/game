@@ -6,7 +6,7 @@ const BitSeparate32 = n => { // ビット分割関数
     n = (n|(n<<2)) & 0x33333333;
     return (n|(n<<1)) & 0x55555555;
 };
-const Get2DMortonNumber = ([x, y]) => BitSeparate32(x) | (BitSeparate32(y) << 1); // 2D空間のモートン番号を算出
+const Get2DMortonNumber = (x, y) => BitSeparate32(x) | (BitSeparate32(y) << 1); // 2D空間のモートン番号を算出
 const calcMostBit = n => { // 最上位ビットの位置
     let i = 0;
     while(n) {
@@ -18,17 +18,17 @@ const calcMostBit = n => { // 最上位ビットの位置
 const layerNum = 6,
       splitNum = 2 ** (layerNum - 1); // 縦横の分割数
 let g_cv;
-const toXY = xy => {
-    const ar = [];
-    for(let i = 0; i < 2; i++) ar.push(xy[i] / (g_cv[i ? 'h' : 'w'] / splitNum) | 0);
-    return ar;
+const toMorton = (x, y) => {
+    const xx = x / g_cv.w * splitNum | 0,
+          yy = y / g_cv.h * splitNum | 0;
+    return Get2DMortonNumber(xx, yy);
 };
 const layerFirstIndex = [...new Array(layerNum + 1).keys()].map(i => (4 ** i - 1) / 3);
-const toIndex = (wa, sd) => { // 座標からtreeのIndexを計算
-    const a = Get2DMortonNumber(toXY(wa)),
-          bit = calcMostBit(a ^ Get2DMortonNumber(toXY(sd))),
+const toIndex = (x, y, xx, yy) => { // 座標からtreeのIndexを計算
+    const m = toMorton(x, y),
+          bit = calcMostBit(m ^ toMorton(xx, yy)),
           L = bit >> 1;
-    return (a >> bit) + layerFirstIndex[layerNum - L - 1];
+    return (m >> bit) + layerFirstIndex[layerNum - L - 1];
 };
 const tree = [...new Array(layerFirstIndex[layerNum])].map(() => new LinkedList());
 const roadMap = (()=>{
@@ -75,8 +75,8 @@ export class Quadtree {
         this.list = {value};
         this.index = null;
     }
-    updateXY(wa, sd){ // 左上と右下の座標配列
-        const idx = toIndex(wa, sd);
+    updateXY(x, y, xx, yy){ // 左上と右下の座標配列
+        const idx = toIndex(x, y, xx, yy);
         if(this.index === idx) return;
         if(this.index !== null) tree[this.index].delete(this.list);
         if(idx >= 0 && idx < tree.length){
