@@ -97,11 +97,15 @@
             return true;
         }
     }
+    const type_player = 0,
+          type_enemy = 1;
     class Player extends Falling {
         constructor(...arg){
             super(...arg);
             this.HP = 3;
             this._wall = 0;
+            this.Quadtree = new Quadtree(this);
+            this.type = type_player;
         }
         update(ctx){
             if(!this.img) return;
@@ -118,6 +122,8 @@
             }
             this.hide = this._damage && g_nowTime % 200 < 100;
             super.update(ctx);
+            const {x,y,w,h} = this;
+            this.Quadtree.set([x, y], [x + w, y + h]);
         }
         jump(){
             if(super.jump()) SE.jump?.();
@@ -141,18 +147,22 @@
         constructor(...arg){
             super(...arg);
             this.collide = 1;
+            this.Quadtree = new Quadtree(this);
+            this.type = type_enemy;
         }
         update(ctx){
-            if(!this.img) return;
-            if(this.isCollide(tsukinose)) tsukinose.damage();
+            if(!this.img) return
             this.move(-5, 0);
             if(this.x + this.w < 0) this.x = cv.w;
             if(Math.random() < 0.001) this.jump();
             if(Math.random() < 0.001) spawnTeki();
             super.update(ctx);
+            const {x,y,w,h} = this;
+            this.Quadtree.set([x, y], [x + w, y + h]);
         }
-        isCollide(mover){
-            const {x,y,w,h} = mover;
+        hit(obj){
+            if(obj.type === type_player) tsukinose.damage();
+            const {x,y,w,h} = obj;
             return (this.x - x) ** 2 + (this.y - y) ** 2 <= ((this.w/2 + w/2) ** 2) * this.collide;
         }
     }
@@ -180,16 +190,20 @@
     }
     const rpgen4 = await importAllSettled([
         'isKeyDown',
+        'Quadtree',
         'canvas',
         'layer',
         'BGM',
         'SE'
     ].map(v => `https://rpgen3.github.io/game/export/${v}.mjs`));
-    const {layer, isKeyDown} = rpgen4,
+    const {layer, isKeyDown, Quadtree} = rpgen4,
           cv = new rpgen4.canvas(footer),
           g_horizonY = {
               valueOf: () => cv.h * 0.9
           };
+    layer.set({
+        update: () => Quadtree.check()
+    });
     let g_nowTime;
     const update = () => {
         g_nowTime = performance.now();
