@@ -14,7 +14,7 @@ const calcMostBit = n => { // 最上位ビットの位置
     }
     return i;
 };
-const layerNum = 5,
+const layerNum = ,
       splitNum = 2 ** (layerNum - 1); // 縦横の分割数
 let g_cv;
 const toXY = xy => {
