@@ -123,7 +123,7 @@
             this.hide = this._damage && g_nowTime % 200 < 100;
             super.update(ctx);
             const {x,y,w,h} = this;
-            this.quadtree.set([x, y], [x + w, y + h]);
+            this.quadtree.updateXY(x, y, x + w, y + h);
         }
         jump(){
             if(super.jump()) SE.jump?.();
@@ -158,7 +158,7 @@
             if(Math.random() < 0.001) spawnTeki();
             super.update(ctx);
             const {x,y,w,h} = this;
-            this.quadtree.set([x, y], [x + w, y + h]);
+            this.quadtree.updateXY(x, y, x + w, y + h);
         }
         hit(obj){
             if(obj.type !== type_player) return;
@@ -202,9 +202,7 @@
               valueOf: () => cv.h * 0.9
           };
     Quadtree.setCV(cv);
-    layer.set({
-        update: () => Quadtree.check()
-    });
+    layer.set(Quadtree);
     let g_nowTime;
     const update = () => {
         g_nowTime = performance.now();
