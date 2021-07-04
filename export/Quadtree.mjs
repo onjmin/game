@@ -53,10 +53,10 @@ const check = tree => {
               list = tree[now];
         if(list.length) list.forEach(v => ar.push(v));
         for(const v of ar){
-            for(const w of ar) if(v !== w) v.hit.?(w);
+            for(const w of ar) if(v !== w) v.hit?.(w);
             for(const w of stack) {
-                v.hit.?(w);
-                w.hit.?(v);
+                v.hit?.(w);
+                w.hit?.(v);
             }
         }
         const next = roadMap[++idx];
