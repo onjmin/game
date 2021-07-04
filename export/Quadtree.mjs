@@ -1,3 +1,4 @@
+// http://marupeke296.com/COL_2D_No8_QuadTree.html
 import {LinkedList} from 'https://rpgen3.github.io/game/export/LinkedList.mjs';
 const BitSeparate32 = n => { // ビット分割関数
     n = (n|(n<<8)) & 0x00ff00ff;
