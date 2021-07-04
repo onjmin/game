@@ -161,9 +161,9 @@
             this.Quadtree.set([x, y], [x + w, y + h]);
         }
         hit(obj){
-            if(obj.type === type_player) tsukinose.damage();
+            if(obj.type !== type_player) return;
             const {x,y,w,h} = obj;
-            return (this.x - x) ** 2 + (this.y - y) ** 2 <= ((this.w/2 + w/2) ** 2) * this.collide;
+            if((this.x - x) ** 2 + (this.y - y) ** 2 <= ((this.w/2 + w/2) ** 2) * this.collide) tsukinose.damage();
         }
     }
     class SimpleText {
