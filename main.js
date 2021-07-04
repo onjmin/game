@@ -201,6 +201,7 @@
           g_horizonY = {
               valueOf: () => cv.h * 0.9
           };
+    Quadtree.setCV(cv);
     layer.set({
         update: () => Quadtree.check()
     });
