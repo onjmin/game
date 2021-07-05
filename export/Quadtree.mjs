@@ -1,5 +1,27 @@
 // http://marupeke296.com/COL_2D_No8_QuadTree.html
 import {LinkedList} from 'https://rpgen3.github.io/game/export/LinkedList.mjs';
+class Quadtree {
+    constructor(value){
+        this.list = {value};
+        this.index = null;
+    }
+    update(x, y, xx, yy){ // 左上と右下の座標
+        const idx = toIndex(x, y, xx, yy);
+        if(this.index === idx) return;
+        if(this.index !== null) tree[this.index].delete(this.list);
+        if(idx >= 0 && idx < tree.length){
+            tree[idx].add(this.list);
+            this.index = idx;
+        }
+        else this.index = null;
+    }
+    static update(){
+        check(tree);
+    }
+    static setCV(cv){
+        g_cv = cv;
+    }
+}
 const BitSeparate32 = n => { // ビット分割関数
     n = (n|(n<<8)) & 0x00ff00ff;
     n = (n|(n<<4)) & 0x0f0f0f0f;
@@ -33,7 +55,7 @@ const toIndex = (x, y, xx, yy) => { // 座標から格納すべきtreeのindex�
 const tree = [...new Array(layerFirstIndex[layerNum])].map(() => new LinkedList());
 const roadMap = (()=>{
     const ar = [],
-          max = layerFirstIndex[layerNum] - 1;
+          max = tree.length - 1;
     const recur = index => {
         ar.push(index);
         const idx = (index << 2) + 1;
@@ -70,25 +92,3 @@ const check = tree => {
         }
     }
 };
-export class Quadtree {
-    constructor(value){
-        this.list = {value};
-        this.index = null;
-    }
-    update(x, y, xx, yy){ // 左上と右下の座標
-        const idx = toIndex(x, y, xx, yy);
-        if(this.index === idx) return;
-        if(this.index !== null) tree[this.index].delete(this.list);
-        if(idx >= 0 && idx < tree.length){
-            tree[idx].add(this.list);
-            this.index = idx;
-        }
-        else this.index = null;
-    }
-    static update(){
-        check(tree);
-    }
-    static setCV(cv){
-        g_cv = cv;
-    }
-}
