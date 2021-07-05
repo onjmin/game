@@ -49,7 +49,6 @@ const check = tree => {
     const stack = [],
           idxMax = roadMap.length - layerNum;
     while(true){
-        if(idx > idxMax) break;
         const now = roadMap[idx],
               ar = [],
               list = tree[now];
@@ -66,6 +65,7 @@ const check = tree => {
         else if(now < next) for(let i = 0; i < ar.length; i++) stack.push(ar[i]); // 子ノードへ向かうとき
         else { // 親ノードに戻るとき
             const max = tree[roadMap[idx++]].length;
+            if(idx > idxMax) break; // 後はルート空間に帰るだけなので
             for(let i = 0; i < max; i++) stack.pop(); // 親ノードの値をすべて破棄
         }
     }
