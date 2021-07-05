@@ -191,13 +191,13 @@
     const rpgen4 = await importAllSettled([
         'isKeyDown',
         'Quadtree',
-        'canvas',
+        'Canvas',
         'layer',
         'BGM',
         'SE'
     ].map(v => `https://rpgen3.github.io/game/export/${v}.mjs`));
     const {layer, isKeyDown, Quadtree} = rpgen4,
-          cv = new rpgen4.canvas(footer),
+          cv = new rpgen4.Canvas(footer),
           g_horizonY = {
               valueOf: () => cv.h * 0.9
           };
