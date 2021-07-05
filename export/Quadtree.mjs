@@ -47,7 +47,7 @@ const roadMap = (()=>{
 const check = tree => {
     let idx = 0;
     const stack = [],
-          idxMax = roadMap.length - 1 - layerNum;
+          idxMax = roadMap.length - 1;
     while(true){
         if(idx > idxMax) break;
         const now = roadMap[idx],
