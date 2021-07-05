@@ -66,7 +66,7 @@ const check = tree => {
             const max = tree[roadMap[idx++]].length;
             for(let i = 0; i < max; i++) stack.pop(); // 親ノードの値をすべて破棄
         }
-        else if(now + 1 === next) continue; // 弟ノードへ向かうとき
+        else if(now && now + 1 === next) continue; // 弟ノードへ向かうとき
         else for(let i = 0; i < ar.length; i++) stack.push(ar[i]); // 子ノードへ向かうとき
     }
 };
