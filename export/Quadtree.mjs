@@ -75,7 +75,7 @@ export class Quadtree {
         this.list = {value};
         this.index = null;
     }
-    updateXY(x, y, xx, yy){ // 左上と右下の座標
+    update(x, y, xx, yy){ // 左上と右下の座標
         const idx = toIndex(x, y, xx, yy);
         if(this.index === idx) return;
         if(this.index !== null) tree[this.index].delete(this.list);
