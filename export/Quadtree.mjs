@@ -1,6 +1,6 @@
 // http://marupeke296.com/COL_2D_No8_QuadTree.html
 import {LinkedList} from 'https://rpgen3.github.io/game/export/LinkedList.mjs';
-class Quadtree {
+export class Quadtree {
     constructor(value){
         this.list = {value};
         this.index = null;
