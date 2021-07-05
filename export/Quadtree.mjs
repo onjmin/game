@@ -31,7 +31,7 @@ const BitSeparate32 = n => { // ビット分割関数
 const Get2DMortonNumber = (x, y) => BitSeparate32(x) | (BitSeparate32(y) << 1); // 2D空間のモートン番号を算出
 const calcMostBit = n => { // 最上位ビットの位置
     let i = 0;
-    while(n) {
+    while(n > 0) {
         n >>= 1;
         i++;
     }
