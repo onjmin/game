@@ -1,4 +1,4 @@
-export class canvas {
+export class Canvas {
     constructor(parentNode){
         const ctx = $('<canvas>').appendTo(parentNode).get(0).getContext('2d');
         this.ctx = ctx;
