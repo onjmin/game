@@ -122,6 +122,9 @@
             }
             this.hide = this._damage && g_nowTime % 200 < 100;
             super.update(ctx);
+            this.updateQuadtree();
+        }
+        updateQuadtree(){
             const {x,y,w,h} = this;
             this.quadtree.update(x, y, x + w, y + h);
         }
@@ -157,6 +160,9 @@
             if(Math.random() < 0.001) this.jump();
             if(Math.random() < 0.001) spawnTeki();
             super.update(ctx);
+            this.updateQuadtree();
+        }
+        updateQuadtree(){
             const {x,y,w,h} = this;
             this.quadtree.update(x, y, x + w, y + h);
         }
