@@ -123,7 +123,7 @@
             this.hide = this._damage && g_nowTime % 200 < 100;
             super.update(ctx);
             const {x,y,w,h} = this;
-            this.quadtree.updateXY(x, y, x + w, y + h);
+            this.quadtree.update(x, y, x + w, y + h);
         }
         jump(){
             if(super.jump()) SE.jump?.();
@@ -158,7 +158,7 @@
             if(Math.random() < 0.001) spawnTeki();
             super.update(ctx);
             const {x,y,w,h} = this;
-            this.quadtree.updateXY(x, y, x + w, y + h);
+            this.quadtree.update(x, y, x + w, y + h);
         }
         hit(obj){
             if(obj.type !== type_player) return;
