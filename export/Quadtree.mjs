@@ -24,7 +24,7 @@ const toMorton = (x, y) => {
     return Get2DMortonNumber(xx, yy);
 };
 const layerFirstIndex = [...new Array(layerNum + 1).keys()].map(i => (4 ** i - 1) / 3);
-const toIndex = (x, y, xx, yy) => { // 座標からtreeのIndexを計算
+const toIndex = (x, y, xx, yy) => { // 座標から格納すべきtreeのindexを計算
     const m = toMorton(x, y),
           bit = calcMostBit(m ^ toMorton(xx, yy)),
           L = bit >> 1;
@@ -75,7 +75,7 @@ export class Quadtree {
         this.list = {value};
         this.index = null;
     }
-    updateXY(x, y, xx, yy){ // 左上と右下の座標配列
+    updateXY(x, y, xx, yy){ // 左上と右下の座標
         const idx = toIndex(x, y, xx, yy);
         if(this.index === idx) return;
         if(this.index !== null) tree[this.index].delete(this.list);
