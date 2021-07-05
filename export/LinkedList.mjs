@@ -1,11 +1,11 @@
 export class LinkedList {
     constructor(){
+        this.length = 0;
         const first = {},
               last = {prev: first};
         first.next = last;
         this.first = first;
         this.last = last;
-        this.length = 0;
     }
     add(obj){
         this.length++;
