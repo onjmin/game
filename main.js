@@ -104,7 +104,7 @@
             super(...arg);
             this.HP = 3;
             this._wall = 0;
-            this.quadtree = new Quadtree(this);
+            this.q = new Quadtree(this);
             this.type = type_player;
         }
         update(ctx){
@@ -122,11 +122,11 @@
             }
             this.hide = this._damage && g_nowTime % 200 < 100;
             super.update(ctx);
-            this.updateQuadtree();
+            this.updateQ();
         }
-        updateQuadtree(){
+        updateQ(){
             const {x,y,w,h} = this;
-            this.quadtree.update(x, y, x + w, y + h);
+            this.q.update(x, y, x + w, y + h);
         }
         jump(){
             if(super.jump()) SE.jump?.();
@@ -150,7 +150,7 @@
         constructor(...arg){
             super(...arg);
             this.collide = 1;
-            this.quadtree = new Quadtree(this);
+            this.q = new Quadtree(this);
             this.type = type_enemy;
         }
         update(ctx){
@@ -160,11 +160,11 @@
             if(Math.random() < 0.001) this.jump();
             if(Math.random() < 0.001) spawnTeki();
             super.update(ctx);
-            this.updateQuadtree();
+            this.updateQ();
         }
-        updateQuadtree(){
+        updateQ(){
             const {x,y,w,h} = this;
-            this.quadtree.update(x, y, x + w, y + h);
+            this.q.update(x, y, x + w, y + h);
         }
         hit(obj){
             if(obj.type !== type_player) return;
