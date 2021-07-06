@@ -20,6 +20,7 @@ export class Quadtree {
     }
     static set(ctx){
         g_ctx = ctx;
+        return this;
     }
 }
 const BitSeparate32 = n => { // ビット分割関数
