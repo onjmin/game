@@ -18,7 +18,7 @@ export class Quadtree {
     static update(){
         check(tree);
     }
-    static setCtx(ctx){
+    static set(ctx){
         g_ctx = ctx;
     }
 }
