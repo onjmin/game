@@ -18,8 +18,8 @@ export class Quadtree {
     static update(){
         check(tree);
     }
-    static setCV(cv){
-        g_cv = cv;
+    static setCtx(ctx){
+        g_ctx = ctx;
     }
 }
 const BitSeparate32 = n => { // ビット分割関数
@@ -39,10 +39,11 @@ const calcMostBit = n => { // 最上位ビットの位置
 };
 const layerNum = 6,
       splitNum = 2 ** (layerNum - 1); // 縦横の分割数
-let g_cv;
+let g_ctx;
 const toMorton = (x, y) => {
-    const xx = x / g_cv.w * splitNum | 0,
-          yy = y / g_cv.h * splitNum | 0;
+    const {width, height} = g_ctx.canvas,
+          xx = x / width * splitNum | 0,
+          yy = y / height * splitNum | 0;
     return Get2DMortonNumber(xx, yy);
 };
 const layerFirstIndex = [...new Array(layerNum + 1).keys()].map(i => (4 ** i - 1) / 3);
