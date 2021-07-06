@@ -207,8 +207,7 @@
           g_horizonY = {
               valueOf: () => cv.h * 0.9
           };
-    Quadtree.set(cv.ctx);
-    layer.set(Quadtree);
+    layer.set(Quadtree.set(cv.ctx));
     let g_nowTime;
     const update = () => {
         g_nowTime = performance.now();
