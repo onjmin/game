@@ -203,7 +203,7 @@
         'SE'
     ].map(v => `https://rpgen3.github.io/game/export/${v}.mjs`));
     const {layer, isKeyDown, Quadtree} = rpgen4,
-          cv = new rpgen4.Canvas(footer),
+          cv = new rpgen4.Canvas(footer).set(0.9, 0.7),
           g_horizonY = {
               valueOf: () => cv.h * 0.9
           };
