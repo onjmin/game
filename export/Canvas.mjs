@@ -14,6 +14,7 @@ export class Canvas {
     set(w, h){
         this._w = w;
         this._h = h;
+        this.resize();
         return this;
     }
     resize(){
