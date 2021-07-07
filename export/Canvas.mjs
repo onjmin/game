@@ -8,8 +8,8 @@ export class Canvas {
         this.h = {
             valueOf: () => ctx.canvas.height
         };
-        $(window).on('resize', () => this.resize()).trigger('resize');
         this._w = this._h = 1;
+        $(window).on('resize', () => this.resize()).trigger('resize');
     }
     set(w, h){
         this._w = w;
