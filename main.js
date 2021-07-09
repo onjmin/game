@@ -211,8 +211,9 @@
     let g_nowTime;
     const update = () => {
         g_nowTime = performance.now();
-        cv.ctx.clearRect(0, 0, cv.w, cv.h);
-        layer.forEach(v => v.update(cv.ctx));
+        const {ctx, w, h} = cv;
+        ctx.clearRect(0, 0, w, h);
+        layer.forEach(v => v.update(ctx));
         requestAnimationFrame(update);
     };
     update();
