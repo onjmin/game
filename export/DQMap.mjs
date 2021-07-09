@@ -1,4 +1,4 @@
-class DQMap {
+export class DQMap {
     constructor(){
         this.info = {};
     }
