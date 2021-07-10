@@ -1,6 +1,7 @@
 export class DQMap {
     constructor(){
         this.info = {};
+        this.define = {};
     }
     set(width, height, depth){
         const {info} = this;
