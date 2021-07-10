@@ -1,15 +1,14 @@
 export class Canvas {
     constructor(parentNode){
-        const ctx = $('<canvas>').appendTo(parentNode).get(0).getContext('2d');
-        this.ctx = ctx;
-        this.w = {
-            valueOf: () => ctx.canvas.width
-        };
-        this.h = {
-            valueOf: () => ctx.canvas.height
-        };
+        this.ctx = $('<canvas>').appendTo(parentNode).get(0).getContext('2d');
         this._w = this._h = 1;
         $(window).on('resize', () => this.resize()).trigger('resize');
+    }
+    get w(){
+        return this.ctx.canvas.width;
+    }
+    get h(){
+        return this.ctx.canvas.height;
     }
     set(w, h){
         this._w = w;
