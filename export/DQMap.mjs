@@ -15,6 +15,12 @@ export class DQMap {
         this.data = [...new Array(depth)].map(()=>[...new Array(height)].map(()=>[...new Array(width).fill(null)]));
         return this;
     }
+    add(){
+        const {info} = this;
+        info.depth++;
+        const {width, height} = info;
+        this.data.push([...new Array(height)].map(()=>[...new Array(width).fill(null)]));
+    }
     input(str){ // 文字列からマップデータを読み込む
         const ar = ['info', 'define', 'data'].map(v => str.match(new RegExp(`#${v}[^#]+`, 'g'))[0]),
               keys = ['width', 'height', 'depth'];
