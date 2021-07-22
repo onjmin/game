@@ -4,7 +4,7 @@
     const rpgen3 = await importAll([
         'input',
         'imgur',
-        'strToImg'
+        'str2img'
     ].map(v => `https://rpgen3.github.io/mylib/export/${v}.mjs`));
     const undef = void 0;
     const html = $('body').css({
