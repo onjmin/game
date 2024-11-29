@@ -237,7 +237,7 @@
         rpgen4.audio.gain = inputVolume / 100;
         if(BGM) BGM.volume = +inputVolume;
     }).trigger('input');
-    const tsukinose = new Player('orQHJ51').goto(16, 0);
+    const tsukinose = new Player('fgZnv8Y').goto(16, 0);
     tsukinose.z = 100;
     const spawnTeki = (()=>{
         let i = 0;
